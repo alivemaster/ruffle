@@ -86,6 +86,14 @@ pub struct Opt {
     #[clap(long = "skipframes", default_value = "0")]
     pub skipframes: u32,
 
+    /// Specify a number of digits to use for frame number in filename
+    #[clap(long = "framedigits")]
+    pub framedigits: Option<u32>,
+
+    /// Use an frame number with offset (skipframes) in filename
+    #[clap(long = "relativenaming", default_value = "false")]
+    pub relativenaming: bool,
+
     /// Don't show a progress bar
     #[clap(short, long, action)]
     pub silent: bool,

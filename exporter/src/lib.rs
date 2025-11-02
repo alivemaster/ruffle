@@ -124,10 +124,18 @@ fn capture_single_swf(exporter: &Exporter, opt: &Opt) -> Result<()> {
             image.save(&output)?;
         }
     } else {
-        let digits = frames.len().to_string().len();
+        let digits: usize = match opt.framedigits {
+            Some(d) => d as usize,
+            None => frames.len().to_string().len(),
+        };
         for (frame, image) in frames.iter().enumerate() {
             let mut path: PathBuf = (&output).into();
-            path.push(format!("{frame:0digits$}.png"));
+            let frame_number = if opt.relativenaming {
+                frame + (opt.skipframes as usize)
+            } else {
+                frame
+            };
+            path.push(format!("{frame_number:0digits$}.png"));
             image.save(&path)?;
         }
     }
@@ -144,8 +152,9 @@ fn capture_single_swf(exporter: &Exporter, opt: &Opt) -> Result<()> {
         }
     } else {
         Some(format!(
-            "Saved first {} frames of {} to {}",
-            frames.len(),
+            "Saved frame {} to {} of {} to {}",
+            opt.skipframes,
+            (opt.skipframes as usize) + frames.len() - 1,
             opt.swf.to_string_lossy(),
             output.to_string_lossy()
         ))
@@ -194,10 +203,18 @@ fn capture_multiple_swfs(exporter: &Exporter, opt: &Opt) -> Result<()> {
                 relative_path.set_extension("");
                 parent.push(&relative_path);
                 let _ = create_dir_all(&parent);
-                let digits = frames.len().to_string().len();
+                let digits: usize = match opt.framedigits {
+                    Some(d) => d as usize,
+                    None => frames.len().to_string().len(),
+                };
                 for (frame, image) in frames.iter().enumerate() {
                     let mut destination = parent.clone();
-                    destination.push(format!("{frame:0digits$}.png"));
+                    let frame_number = if opt.relativenaming {
+                        frame + (opt.skipframes as usize)
+                    } else {
+                        frame
+                    };
+                    destination.push(format!("{frame_number:0digits$}.png"));
                     image.save(&destination)?;
                 }
             }
@@ -218,8 +235,9 @@ fn capture_multiple_swfs(exporter: &Exporter, opt: &Opt) -> Result<()> {
             output.to_string_lossy()
         ),
         FrameSelection::Count(n) => format!(
-            "Saved first {} frames of {} files to {}",
-            n,
+            "Saved frame {} to {} of {} files to {}",
+            opt.skipframes,
+            opt.skipframes + n.get() - 1,
             files.len(),
             output.to_string_lossy()
         ),
