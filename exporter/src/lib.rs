@@ -124,13 +124,13 @@ fn capture_single_swf(exporter: &Exporter, opt: &Opt) -> Result<()> {
             image.save(&output)?;
         }
     } else {
-        let digits: usize = match opt.framedigits {
+        let digits: usize = match opt.filenamedigits {
             Some(d) => d as usize,
             None => frames.len().to_string().len(),
         };
         for (frame, image) in frames.iter().enumerate() {
             let mut path: PathBuf = (&output).into();
-            let frame_number = if opt.relativenaming {
+            let frame_number = if opt.relative_naming {
                 frame + (opt.skipframes as usize)
             } else {
                 frame
@@ -203,13 +203,13 @@ fn capture_multiple_swfs(exporter: &Exporter, opt: &Opt) -> Result<()> {
                 relative_path.set_extension("");
                 parent.push(&relative_path);
                 let _ = create_dir_all(&parent);
-                let digits: usize = match opt.framedigits {
+                let digits: usize = match opt.filenamedigits {
                     Some(d) => d as usize,
                     None => frames.len().to_string().len(),
                 };
                 for (frame, image) in frames.iter().enumerate() {
                     let mut destination = parent.clone();
-                    let frame_number = if opt.relativenaming {
+                    let frame_number = if opt.relative_naming {
                         frame + (opt.skipframes as usize)
                     } else {
                         frame
